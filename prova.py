@@ -2,6 +2,7 @@ import pygame, sys
 from random import randint
 #import datetime
 import datetime
+from connector import *
 
 pygame.init()
 screen_x = 680

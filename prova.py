@@ -11,15 +11,14 @@ screen = pygame.display.set_mode((screen_x, screen_y))
 
 pygame.display.set_caption("First Pygame Application")
 
-bg = pygame.image.load("alienbg.jpg")
-#bg1 = pygame.transform.scale(bg, (screen_x,screen_y))
-inbg = pygame.image.load('inbg.png')
-ss2 = pygame.image.load("spacestation.png") 
-ss = pygame.image.load('daicazzo.png')
-ss1 = pygame.image.load('starsh.png')
-ls = pygame.image.load('shot.png')
-bgfin = pygame.image.load('bgperfect.png')
-heart = pygame.image.load('hearticon3.png')
+bg = pygame.image.load("./images/alienbg.jpg")
+inbg = pygame.image.load('./images/inbg.png')
+ss2 = pygame.image.load("./images/spacestation.png") 
+ss = pygame.image.load('./images/daicazzo.png')
+ss1 = pygame.image.load('./images/starsh.png')
+ls = pygame.image.load('./images/shot.png')
+bgfin = pygame.image.load('./images/bgperfect.png')
+heart = pygame.image.load('./images/hearticon3.png')
 start_time = 0
 
 a = 0
@@ -71,6 +70,8 @@ class Enemy(Entity):
         if self.y > screen_y:
             self.x = randint(0,screen_x - p.lato)
             self.y = 0      
+
+        
                 
 class Heart(Entity):
     def __init__(self,x,y,color,lato):  
@@ -143,11 +144,11 @@ while True:
             screen.blit(bg,(0,0))
             elapsed_time = datetime.datetime.now() - start_time
 
-            textsurface = myfont.render('uccisioni = ' + str(a), False, (200, 0, 0))
-            textsurface1 = myfont.render('tempo = ' + str(elapsed_time), False, (200, 0, 0))
-            textsurface2 = myfont.render('level: ' + str(l), False, (200, 0, 0))
-            textsurface7 = myfont.render('lifes: ', False, (0,255,255))
-            #textsurface8 = myfont.render('var: ' + str(lifes), False, (255,255,255))
+            textsurface = myfont.render('Score: ' + str(a), False, (200, 0, 0))
+            textsurface1 = myfont.render('Time: ' + str(elapsed_time), False, (200, 0, 0))
+            textsurface2 = myfont.render('Level: ' + str(l), False, (200, 0, 0))
+            textsurface7 = myfont.render('Lifes: ', False, (0,255,255))
+           
             screen.blit(textsurface,(0,screen_y - 30))
             screen.blit(textsurface1,(200,screen_y - 30))
             screen.blit(textsurface2,(600,screen_y - 30))
@@ -158,7 +159,7 @@ while True:
             screen.blit(ss, (e.x,e.y))
             screen.blit(ss2, (f.x,f.y))
             screen.blit(ss1, (p.x, p.y))
-            #screen.blit(textsurface8, (600,20))
+           
                         
             b.move()
             f.move()
@@ -174,9 +175,10 @@ while True:
                     f.x = randint(0,screen_x - p.lato)
                     f.y = 0
                     a += 1
-
             if e.y == screen_y or f.y == screen_y:
                 lifes -=1
+                if e.y == f.y:
+                    lifes -=1
             if lifes == 2:
                 h3.x=h2.x
                 h3.y=h2.y
@@ -186,6 +188,7 @@ while True:
                 h3.y=h1.y
                 h2.x=h1.x
                 h2.y=h1.y
+            
 
             if lifes <= 0:
                 screen.blit(bgfin,(0,0))
@@ -206,9 +209,9 @@ while True:
                     l = 2
                     e.y += 6
                     b.y -= 3
-                    bg= pygame.image.load('back4.jpg')
-                    ss = pygame.image.load('ss3.png')
-                    ss2 = pygame.image.load('ss4.png')
+                    bg= pygame.image.load('./images/back4.jpg')
+                    ss = pygame.image.load('./images/ss3.png')
+                    ss2 = pygame.image.load('./images/ss4.png')
                 '''if a >= 10 and a <= 14:
                     l = 3
                     e.y += 6
@@ -220,9 +223,9 @@ while True:
                     e.y += 12
                     f.y += 12
                     b.y -=12
-                    bg= pygame.image.load('back3.png')
-                    ss = pygame.image.load('ss5.png')
-                    ss2 = pygame.image.load('ss6.png')
+                    bg= pygame.image.load('./images/back3.png')
+                    ss = pygame.image.load('./images/ss5.png')
+                    ss2 = pygame.image.load('./images/ss6.png')
                 if event.type == pygame.QUIT:
                     sys.exit()
                 if event.type == pygame.KEYDOWN:

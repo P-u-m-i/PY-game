@@ -1,6 +1,5 @@
 import pygame, sys
 from random import randint
-#import datetime
 import datetime
 from connector import *
 
@@ -15,7 +14,7 @@ bg = pygame.image.load("./images/alienbg.jpg")
 inbg = pygame.image.load('./images/inbg.png')
 ss2 = pygame.image.load("./images/spacestation.png") 
 ss = pygame.image.load('./images/daicazzo.png')
-ss1 = pygame.image.load('./images/starsh.png')
+ss1 = pygame.image.load('./images/starship1.png')
 ls = pygame.image.load('./images/shot.png')
 bgfin = pygame.image.load('./images/bgperfect.png')
 heart = pygame.image.load('./images/hearticon3.png')
@@ -23,9 +22,25 @@ start_time = 0
 
 a = 0
 l = 1
+lifes = 3
+
 pygame.font.init()
 myfont = pygame.font.SysFont('Comic Sans MS', 20)
 myfont4 = pygame.font.SysFont('Comic Sans Ms', 25)
+
+
+def db():
+    mycursor = mydb.cursor()
+    sql = "INSERT INTO Users (Username, Level, Score, Gametime ) VALUES (%s, %s, %s, %s)"
+    val = [text, l, a, elapsed_time ]
+    print(val)
+    mycursor.execute(sql, val)
+    mydb.commit()
+    print(mycursor.rowcount, "was inserted.")     
+
+    
+    
+    
 
 class Entity:
     def __init__ (self,x,y,color,lato):
@@ -42,7 +57,35 @@ class Entity:
 class Player(Entity):
     def __init__(self,x,y,color,lato):
         super().__init__(x,y,color,lato)
- 
+
+    def move(self):
+        
+        for event in pygame.event.get():    
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w:
+                    b.y -= self.lato
+                    self.y -= self.lato                                     
+                    screen.blit(ss1, (self.x,self.y))
+                    
+                if event.key == pygame.K_s and self.y < 480-self.lato:
+                    b.y += self.lato
+                    self.y += self.lato                        
+                    screen.blit(ss1, (self.x,self.y))
+                    
+                if event.key == pygame.K_a and self.x > 0:
+                    b.x -= self.lato
+                    self.x -= self.lato                        
+                    screen.blit(ss1, (self.x,self.y))
+                    
+                if event.key == pygame.K_d and self.x+self.lato < screen_x:
+                    b.x += self.lato
+                    self.x += self.lato                        
+                    screen.blit(ss1, (self.x,self.y))                
+            if event.type == pygame.QUIT:
+                db()
+                sys.exit()
+                
+            
 
 class Bullet(Entity):
     def __init__ (self,x,y,start,color,lato):
@@ -57,6 +100,9 @@ class Bullet(Entity):
             self.start = self.x
             self.y = p.y-10
              
+class Heart(Entity):
+    def __init__(self,x,y,color,lato):  
+        super().__init__(x,y,color,lato) 
 
 class Enemy(Entity):
     def __init__(self,x,y,color,lato):
@@ -64,18 +110,46 @@ class Enemy(Entity):
 
     def move(self):
         screen.blit(ss, (e.x,e.y))
-        screen.blit(ss2, (f.x,f.y))
+        screen.blit(ss2, (f.x,f.y)) 
+        global lifes
         self.y += 2
         global screen_y
-        if self.y > screen_y:
+        if self.y >= screen_y:
             self.x = randint(0,screen_x - p.lato)
             self.y = 0      
+            lifes -=1                    
+                            
+        if lifes == 3:
+            screen.blit(heart,(h1.x,h1.y))
+            screen.blit(heart,(h2.x,h2.y))
+            screen.blit(heart,(h3.x,h3.y))
+        if lifes == 2:
+            screen.blit(heart,(h1.x,h1.y))
+            screen.blit(heart,(h2.x,h2.y))
+
+        if lifes ==1:
+            screen.blit(heart,(h1.x,h1.y))
+        
+        if lifes <= 0:
+            screen.blit(bgfin,(0,0))
+            myfont6= pygame.font.SysFont('Double Struck', 100)
+            textsurface6 = myfont6.render('GAME OVER!', True, (255,0,0) )
+            screen.blit(textsurface6,(120, screen_y/2-50))   
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    db()
+                    sys.exit()
+                    
+                if event.type == pygame.KEYDOWN:
+                    db()
+                    sys.exit()
 
         
                 
-class Heart(Entity):
-    def __init__(self,x,y,color,lato):  
-        super().__init__(x,y,color,lato)        
+           
+        
+       
 
 p = Player((screen_x/2)-20,400,[255,255,255],40)
 b = Bullet(p.x+15,p.y-10,p.x+15,[0,255,0],10)
@@ -93,7 +167,6 @@ done = False
 done1 = False
 myfont3 = pygame.font.SysFont('Comic Sans Ms', 30)
 myfont5 = pygame.font.SysFont('Italics', 30)
-lifes = 3
 while True:
     
     screen.blit(inbg,(0,0))
@@ -153,18 +226,18 @@ while True:
             screen.blit(textsurface1,(200,screen_y - 30))
             screen.blit(textsurface2,(600,screen_y - 30))
             screen.blit(textsurface7, (5,15))
-            screen.blit(heart,(h1.x,h1.y))
-            screen.blit(heart,(h2.x,h2.y))
-            screen.blit(heart,(h3.x,h3.y))
+           
             screen.blit(ss, (e.x,e.y))
             screen.blit(ss2, (f.x,f.y))
             screen.blit(ss1, (p.x, p.y))
-           
-                        
+            p.move()
+            
             b.move()
             f.move()
             e.move()
             
+
+                        
             if b.y <= e.y + e.lato and b.start >= e.x and b.start < e.x + e.lato:
                     
                     e.x = randint(0,screen_x - p.lato)
@@ -174,82 +247,43 @@ while True:
                     
                     f.x = randint(0,screen_x - p.lato)
                     f.y = 0
-                    a += 1
-            if e.y == screen_y or f.y == screen_y:
-                lifes -=1
-                if e.y == f.y:
-                    lifes -=1
-            if lifes == 2:
-                h3.x=h2.x
-                h3.y=h2.y
-
-            if lifes ==1:
-                h3.x=h1.x
-                h3.y=h1.y
-                h2.x=h1.x
-                h2.y=h1.y
+                    a += 1          
             
+            if a >= 5 and a <= 9:
+                l = 2
+                #e.y += 2
+                #f.y += 2
+                b.y -= 2
+                bg= pygame.image.load('./images/back4.jpg')
+                ss = pygame.image.load('./images/ss3.png')
+                ss2 = pygame.image.load('./images/ss4.png')
+            if a >= 10 and a <= 14:
+                l = 3
+                #e.y += 4
+                #f.y += 4
+                b.y -= 4
+                bg= pygame.image.load('./images/space7.png')
+                ss = pygame.image.load('./images/enemy.png')
+                ss2 = pygame.image.load('./images/starship2.png')
+            if a >= 15 and a <= 20:
+                l = 4
+                #e.y += 6
+                #f.y += 6
+                b.y -= 6
+                bg= pygame.image.load('./images/space2.png')
+                ss = pygame.image.load('./images/ss5.png')
+                ss2 = pygame.image.load('./images/ss6.png')         
 
-            if lifes <= 0:
-                screen.blit(bgfin,(0,0))
-                myfont6= pygame.font.SysFont('Double Struck', 100)
-                textsurface6 = myfont6.render('GAME OVER!', True, (255,0,0) )
-                screen.blit(textsurface6,(120, screen_y/2-50))
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        sys.exit()
-                        
-                        if event.type == pygame.KEYDOWN:
-                            sys.exit()    
-                    
-                    
-            for event in pygame.event.get():
+            if a >= 21 :
+                l = 5
+                #e.y += 8
+                #f.y += 8
+                b.y -= 8
+                bg= pygame.image.load('./images/back3.png')
+                ss = pygame.image.load('./images/starsh.png')
+                ss2 = pygame.image.load('./images/starship3.png')     
                 
-                if a >= 5 and a <= 9:
-                    l = 2
-                    e.y += 6
-                    b.y -= 3
-                    bg= pygame.image.load('./images/back4.jpg')
-                    ss = pygame.image.load('./images/ss3.png')
-                    ss2 = pygame.image.load('./images/ss4.png')
-                '''if a >= 10 and a <= 14:
-                    l = 3
-                    e.y += 6
-                    f.y += 6
-                    b.y -=6'''
-
-                if a >= 15:
-                    l = 4
-                    e.y += 12
-                    f.y += 12
-                    b.y -=12
-                    bg= pygame.image.load('./images/back3.png')
-                    ss = pygame.image.load('./images/ss5.png')
-                    ss2 = pygame.image.load('./images/ss6.png')
-                if event.type == pygame.QUIT:
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_w:
-                        b.y -= p.lato
-                        p.y -= p.lato                                     
-                        screen.blit(ss1, (p.x,p.y))
-                        
-                    if event.key == pygame.K_s and p.y < 480-p.lato:
-                        b.y += p.lato
-                        p.y += p.lato                        
-                        screen.blit(ss1, (p.x,p.y))
-                        
-                    if event.key == pygame.K_a and p.x > 0:
-                        b.x -= p.lato
-                        p.x -= p.lato                        
-                        screen.blit(ss1, (p.x,p.y))
-                        
-                    if event.key == pygame.K_d and p.x+p.lato < screen_x:
-                        b.x += p.lato
-                        p.x += p.lato                        
-                        screen.blit(ss1, (p.x,p.y))
-                        
-                  
             clock = pygame.time.Clock()
             clock.tick(60)
             pygame.display.update()
+

@@ -28,7 +28,17 @@ pygame.font.init()
 myfont = pygame.font.SysFont('Comic Sans MS', 20)
 myfont4 = pygame.font.SysFont('Comic Sans Ms', 25)
 
+mycursor = mydb.cursor()
+mycursor.execute("SELECT MAX(Score) FROM Users")
+valmax = mycursor.fetchall()
+maxx=list(valmax[0])
+if maxx[0] == None :
+    maxx = str(0)
 
+    
+
+
+   
 def db():
     mycursor = mydb.cursor()
     sql = "INSERT INTO Users (Username, Level, Score, Gametime ) VALUES (%s, %s, %s, %s)"
@@ -82,7 +92,6 @@ class Player(Entity):
                     self.x += self.lato                        
                     screen.blit(ss1, (self.x,self.y))                
             if event.type == pygame.QUIT:
-                db()
                 sys.exit()
                 
             
@@ -221,12 +230,14 @@ while True:
             textsurface1 = myfont.render('Time: ' + str(elapsed_time), False, (200, 0, 0))
             textsurface2 = myfont.render('Level: ' + str(l), False, (200, 0, 0))
             textsurface7 = myfont.render('Lifes: ', False, (0,255,255))
-           
+            textsurface9 = myfont.render('Score Record: ' + str(maxx[0]), False, (255,255,0))
+            
             screen.blit(textsurface,(0,screen_y - 30))
             screen.blit(textsurface1,(200,screen_y - 30))
             screen.blit(textsurface2,(600,screen_y - 30))
             screen.blit(textsurface7, (5,15))
-           
+            screen.blit(textsurface9, (500,15))
+            
             screen.blit(ss, (e.x,e.y))
             screen.blit(ss2, (f.x,f.y))
             screen.blit(ss1, (p.x, p.y))
@@ -251,24 +262,24 @@ while True:
             
             if a >= 5 and a <= 9:
                 l = 2
-                #e.y += 2
-                #f.y += 2
+                e.y += 2
+                f.y += 2
                 b.y -= 2
                 bg= pygame.image.load('./images/back4.jpg')
                 ss = pygame.image.load('./images/ss3.png')
                 ss2 = pygame.image.load('./images/ss4.png')
             if a >= 10 and a <= 14:
                 l = 3
-                #e.y += 4
-                #f.y += 4
+                e.y += 4
+                f.y += 4
                 b.y -= 4
                 bg= pygame.image.load('./images/space7.png')
                 ss = pygame.image.load('./images/enemy.png')
                 ss2 = pygame.image.load('./images/starship2.png')
             if a >= 15 and a <= 20:
                 l = 4
-                #e.y += 6
-                #f.y += 6
+                e.y += 6
+                f.y += 6
                 b.y -= 6
                 bg= pygame.image.load('./images/space2.png')
                 ss = pygame.image.load('./images/ss5.png')
@@ -276,8 +287,8 @@ while True:
 
             if a >= 21 :
                 l = 5
-                #e.y += 8
-                #f.y += 8
+                e.y += 8
+                f.y += 8
                 b.y -= 8
                 bg= pygame.image.load('./images/back3.png')
                 ss = pygame.image.load('./images/starsh.png')

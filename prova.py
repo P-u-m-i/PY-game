@@ -28,10 +28,10 @@ pygame.font.init()
 myfont = pygame.font.SysFont('Comic Sans MS', 20)
 myfont4 = pygame.font.SysFont('Comic Sans Ms', 25)
 
-mycursor = mydb.cursor()
+
 mycursor.execute("SELECT MAX(Score) FROM Users")
 valmax = mycursor.fetchall()
-maxx=list(valmax[0])
+maxx = list(valmax[0])
 if maxx[0] == None :
     maxx = str(0)
 
@@ -40,10 +40,8 @@ if maxx[0] == None :
 
    
 def db():
-    mycursor = mydb.cursor()
     sql = "INSERT INTO Users (Username, Level, Score, Gametime ) VALUES (%s, %s, %s, %s)"
     val = [text, l, a, elapsed_time ]
-    print(val)
     mycursor.execute(sql, val)
     mydb.commit()
     print(mycursor.rowcount, "was inserted.")     
@@ -59,41 +57,25 @@ class Entity:
         self.color = color
         self.lato = lato 
 
-    def draw(self):
-        for i in char:
-            pygame.draw.rect(screen,i.color,(i.x,i.y,i.lato,i.lato))
-
-
 class Player(Entity):
     def __init__(self,x,y,color,lato):
         super().__init__(x,y,color,lato)
 
     def move(self):
-        
         for event in pygame.event.get():    
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w:
                     b.y -= self.lato
-                    self.y -= self.lato                                     
-                    screen.blit(ss1, (self.x,self.y))
-                    
+                    self.y -= self.lato                                                         
                 if event.key == pygame.K_s and self.y < 480-self.lato:
                     b.y += self.lato
                     self.y += self.lato                        
-                    screen.blit(ss1, (self.x,self.y))
-                    
                 if event.key == pygame.K_a and self.x > 0:
                     b.x -= self.lato
                     self.x -= self.lato                        
-                    screen.blit(ss1, (self.x,self.y))
-                    
                 if event.key == pygame.K_d and self.x+self.lato < screen_x:
                     b.x += self.lato
-                    self.x += self.lato                        
-                    screen.blit(ss1, (self.x,self.y))                
-            if event.type == pygame.QUIT:
-                sys.exit()
-                
+                    self.x += self.lato                                       
             
 
 class Bullet(Entity):
@@ -102,33 +84,27 @@ class Bullet(Entity):
         super().__init__(x,y,color,lato)
     
     def move (self):
-        screen.blit(ls, (b.start,b.y))
         self.y -= self.lato + 10
         
         if self.y<0:
             self.start = self.x
             self.y = p.y-10
              
-class Heart(Entity):
-    def __init__(self,x,y,color,lato):  
-        super().__init__(x,y,color,lato) 
 
 class Enemy(Entity):
     def __init__(self,x,y,color,lato):
        super().__init__(x,y,color,lato)
 
     def move(self):
-        screen.blit(ss, (e.x,e.y))
-        screen.blit(ss2, (f.x,f.y)) 
         global lifes
+
         self.y += 2
-        global screen_y
         if self.y >= screen_y:
             self.x = randint(0,screen_x - p.lato)
             self.y = 0      
             lifes -=1                    
                             
-        if lifes == 3:
+        '''if lifes == 3:
             screen.blit(heart,(h1.x,h1.y))
             screen.blit(heart,(h2.x,h2.y))
             screen.blit(heart,(h3.x,h3.y))
@@ -140,10 +116,8 @@ class Enemy(Entity):
             screen.blit(heart,(h1.x,h1.y))
         
         if lifes <= 0:
-            screen.blit(bgfin,(0,0))
-            myfont6= pygame.font.SysFont('Double Struck', 100)
-            textsurface6 = myfont6.render('GAME OVER!', True, (255,0,0) )
-            screen.blit(textsurface6,(120, screen_y/2-50))   
+            
+               
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -152,12 +126,41 @@ class Enemy(Entity):
                     
                 if event.type == pygame.KEYDOWN:
                     db()
-                    sys.exit()
+                    sys.exit()'''
 
+def gameOver():
+    screen.blit(bgfin,(0,0))
+    myfont6= pygame.font.SysFont('Double Struck', 100)
+    textsurface6 = myfont6.render('GAME OVER!', True, (255,0,0) )
+    screen.blit(textsurface6,(120, screen_y/2-50))
+
+
+def vita(n):
+    if n == 0:
+        gameOver()
+    for i in range(0,n):
+        screen.blit(heart,(i*25+60,20))
         
-                
-           
-        
+def init():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+    clock = pygame.time.Clock()
+    clock.tick(60)
+    pygame.display.update()   
+
+def scritte():
+    textsurface = myfont.render('Score: ' + str(a), False, (200, 0, 0))
+    textsurface1 = myfont.render('Time: ' + str(elapsed_time), False, (200, 0, 0))
+    textsurface2 = myfont.render('Level: ' + str(l), False, (200, 0, 0))
+    textsurface7 = myfont.render('Lifes: ', False, (0,255,255))
+    textsurface9 = myfont.render('Score Record: ' + str(maxx[0]), False, (255,255,0))
+
+    screen.blit(textsurface,(0,screen_y - 30))
+    screen.blit(textsurface1,(200,screen_y - 30))
+    screen.blit(textsurface2,(600,screen_y - 30))
+    screen.blit(textsurface7, (5,15))
+    screen.blit(textsurface9, (500,15))   
        
 
 p = Player((screen_x/2)-20,400,[255,255,255],40)
@@ -165,9 +168,7 @@ b = Bullet(p.x+15,p.y-10,p.x+15,[0,255,0],10)
 e = Enemy(randint(0,screen_x - p.lato),0,[255,0,0],40)
 f = Enemy(randint(0,screen_x - p.lato),0,[255,0,0],40)
 
-h1 = Heart(60,20, [0,0,0], 20)
-h2 = Heart(85,20, [0,0,0], 20)
-h3 = Heart(110,20, [0,0,0], 20)
+
 
 inputboxx = screen_x/2 - 180
 inputboxy = screen_y/2 - 40
@@ -176,38 +177,26 @@ done = False
 done1 = False
 myfont3 = pygame.font.SysFont('Comic Sans Ms', 30)
 myfont5 = pygame.font.SysFont('Italics', 30)
+
 while True:
-    
+    init()
     screen.blit(inbg,(0,0))
     textsurface5 = myfont5.render('Tap Enter to play', False, (255,255,255))
     screen.blit(textsurface5, (250, 420))
-   
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
+    for event in pygame.event.get():   
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 done1= True
-    
-    clock = pygame.time.Clock()
-    clock.tick(60)
-    pygame.display.update()            
-   
     while done1:
+        init()
         screen.blit(bgfin,(0,0))
         textsurface3 = myfont3.render('Username: ' , True, (255,255,0))
         screen.blit(textsurface3 ,(screen_x/2 - 180, screen_y/2 - 80))
-                
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                sys.exit()
-            
+        for event in pygame.event.get():            
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    print(text)
                     done = True
                     start_time = datetime.datetime.now()
-                    
                 elif event.key == pygame.K_BACKSPACE:
                     text = text[:-1]
                 else:
@@ -216,33 +205,24 @@ while True:
 
         textsurface4 = myfont4.render( text, False, (255,255,255))
         screen.blit(textsurface4 ,(inputboxx + 5, inputboxy + 10))
-        clock = pygame.time.Clock()
-        clock.tick(60)
-        pygame.display.update()
 
         while done: 
+            init()
 
             screen.fill([0,0,0])
             screen.blit(bg,(0,0))
-            elapsed_time = datetime.datetime.now() - start_time
-
-            textsurface = myfont.render('Score: ' + str(a), False, (200, 0, 0))
-            textsurface1 = myfont.render('Time: ' + str(elapsed_time), False, (200, 0, 0))
-            textsurface2 = myfont.render('Level: ' + str(l), False, (200, 0, 0))
-            textsurface7 = myfont.render('Lifes: ', False, (0,255,255))
-            textsurface9 = myfont.render('Score Record: ' + str(maxx[0]), False, (255,255,0))
-            
-            screen.blit(textsurface,(0,screen_y - 30))
-            screen.blit(textsurface1,(200,screen_y - 30))
-            screen.blit(textsurface2,(600,screen_y - 30))
-            screen.blit(textsurface7, (5,15))
-            screen.blit(textsurface9, (500,15))
-            
             screen.blit(ss, (e.x,e.y))
             screen.blit(ss2, (f.x,f.y))
             screen.blit(ss1, (p.x, p.y))
-            p.move()
+            screen.blit(ls, (b.start,b.y))
+
+            elapsed_time = datetime.datetime.now() - start_time
+
+            scritte()            
             
+            vita(lifes) 
+
+            p.move()
             b.move()
             f.move()
             e.move()
@@ -294,7 +274,4 @@ while True:
                 ss = pygame.image.load('./images/starsh.png')
                 ss2 = pygame.image.load('./images/starship3.png')     
                 
-            clock = pygame.time.Clock()
-            clock.tick(60)
-            pygame.display.update()
 
